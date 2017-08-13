@@ -32,32 +32,52 @@ class Isp
             return  'Error Bad Request / Invalid IP Address';
         }
 
+
         if(isset($output['comment']['line'])) {
 
             $comment = $output['comment']['line'];
 
             if( is_array($comment)) {
                 foreach ($comment as $line){
-                    $ispComment .= $line . "\n";
+
+                    if(!is_array($line)) {
+
+                        $ispComment .= $line . "\n";
+                    }
                 }
             } else {
 
-                $ispComment = $comment;
+                $ispComment = $comment . "\n";
             }
 
         }
+
 
         if(!empty($output['orgRef']))
         {
 
             $orgUrl = $output['orgRef'];
 
-
             $data = file_get_contents($orgUrl);
             $xml = simplexml_load_string($data);
             $orgJson = json_encode($xml);
             $orgOutput = json_decode($orgJson, true);
 
+
+            if(isset($orgOutput['comment']['line'])) {
+
+                $orgComment = $orgOutput['comment']['line'];
+
+                if( is_array($orgComment)) {
+                    foreach ($orgComment as $line){
+                        $ispComment .= $line . "\n";
+                    }
+                } else {
+
+                    $ispComment .= $orgComment . "\n";
+                }
+
+            }
 
             if(isset($orgOutput['name'])) {
 
@@ -122,6 +142,7 @@ class Isp
 
             $result .= "Comment: ". $ispComment . "\n";
         }
+
 
         return $result;
 
